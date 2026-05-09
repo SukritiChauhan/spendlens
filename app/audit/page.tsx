@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { AI_TOOLS } from '../../src/lib/pricing'
-import { AuditInput, UserToolInput } from '../../src/types'
+import { useState, useEffect } from 'react'
+import { AI_TOOLS } from '../lib/pricing'
+import { AuditInput, UserToolInput } from '../types'
 
 const USE_CASES = [
   { id: 'coding', label: 'Coding' },
@@ -12,10 +12,43 @@ const USE_CASES = [
   { id: 'mixed', label: 'Mixed' },
 ]
 
+const STORAGE_KEY = 'spendlens-form-state'
+
 export default function AuditPage() {
   const [teamSize, setTeamSize] = useState(1)
   const [useCase, setUseCase] = useState<AuditInput['useCase']>('mixed')
   const [selectedTools, setSelectedTools] = useState<UserToolInput[]>([])
+  const [loaded, setLoaded] = useState(false)
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        setTeamSize(parsed.teamSize || 1)
+        setUseCase(parsed.useCase || 'mixed')
+        setSelectedTools(parsed.tools || [])
+      }
+    } catch (e) {
+      console.error('Failed to load saved form state', e)
+    }
+    setLoaded(true)
+  }, [])
+
+  // Save to localStorage whenever form changes
+  useEffect(() => {
+    if (!loaded) return
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        teamSize,
+        useCase,
+        tools: selectedTools,
+      }))
+    } catch (e) {
+      console.error('Failed to save form state', e)
+    }
+  }, [teamSize, useCase, selectedTools, loaded])
 
   const addTool = () => {
     setSelectedTools([
@@ -54,6 +87,8 @@ export default function AuditPage() {
     localStorage.setItem('spendlens-audit', JSON.stringify(audit))
     window.location.href = '/results'
   }
+
+  if (!loaded) return null
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -129,7 +164,9 @@ export default function AuditPage() {
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white"
                   >
                     {toolData?.plans.map(p => (
-                      <option key={p.id} value={p.id}>{p.name} — ${p.pricePerSeat}/seat</option>
+                      <option key={p.id} value={p.id}>
+                        {p.name} {p.pricePerSeat > 0 ? `— $${p.pricePerSeat}/seat` : '— Custom/Usage-based'}
+                      </option>
                     ))}
                   </select>
                 </div>

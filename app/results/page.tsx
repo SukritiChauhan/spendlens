@@ -14,6 +14,7 @@ export default function ResultsPage() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
+  const [summary, setSummary] = useState('')
 
   useEffect(() => {
     try {
@@ -31,6 +32,20 @@ export default function ResultsPage() {
 
   const saveAudit = async (auditResult: AuditResult) => {
     try {
+      const summaryRes = await fetch('/api/summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recommendations: auditResult.recommendations,
+          totalMonthlySavings: auditResult.totalMonthlySavings,
+          totalAnnualSavings: auditResult.totalAnnualSavings,
+          useCase: auditResult.input.useCase,
+          teamSize: auditResult.input.teamSize,
+        }),
+      })
+      const summaryData = await summaryRes.json()
+      setSummary(summaryData.summary || '')
+
       await fetch('/api/audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -40,7 +55,7 @@ export default function ResultsPage() {
           recommendations: auditResult.recommendations,
           totalMonthlySavings: auditResult.totalMonthlySavings,
           totalAnnualSavings: auditResult.totalAnnualSavings,
-          summary: auditResult.summary,
+          summary: summaryData.summary,
         }),
       })
       setShareUrl(`${window.location.origin}/share/${auditResult.id}`)
@@ -109,6 +124,7 @@ export default function ResultsPage() {
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-12">
+
         <div className={`rounded-2xl p-8 mb-8 text-center ${isLowSavings ? 'bg-blue-50' : 'bg-emerald-50'}`}>
           {isLowSavings ? (
             <div>
@@ -131,6 +147,13 @@ export default function ResultsPage() {
             <h2 className="text-xl font-bold mb-2">Get discounted AI credits and save even more</h2>
             <p className="text-gray-400 text-sm mb-4">Credex sources discounted AI infrastructure credits from companies that overforecast. At your spend level, you could save an additional 20-40% on top of these recommendations.</p>
             <a href="https://credex.rocks" target="_blank" rel="noopener noreferrer" className="inline-block bg-emerald-500 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-emerald-400 transition">Book a Credex Consultation</a>
+          </div>
+        )}
+
+        {summary && (
+          <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
+            <h2 className="font-semibold text-gray-900 mb-3">AI Summary</h2>
+            <p className="text-gray-600 text-sm leading-relaxed">{summary}</p>
           </div>
         )}
 

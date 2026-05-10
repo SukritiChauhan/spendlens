@@ -10,7 +10,10 @@ export default function ResultsPage() {
   const [email, setEmail] = useState('')
   const [company, setCompany] = useState('')
   const [role, setRole] = useState('')
+  const [honeypot, setHoneypot] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [shareUrl, setShareUrl] = useState('')
 
   useEffect(() => {
     try {
@@ -19,11 +22,70 @@ export default function ResultsPage() {
         const input: AuditInput = JSON.parse(saved)
         const auditResult = runAudit(input)
         setResult(auditResult)
+        saveAudit(auditResult)
       }
     } catch (e) {
       console.error('Failed to load audit', e)
     }
   }, [])
+
+  const saveAudit = async (auditResult: AuditResult) => {
+    try {
+      await fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: auditResult.id,
+          input: auditResult.input,
+          recommendations: auditResult.recommendations,
+          totalMonthlySavings: auditResult.totalMonthlySavings,
+          totalAnnualSavings: auditResult.totalAnnualSavings,
+          summary: auditResult.summary,
+        }),
+      })
+      setShareUrl(`${window.location.origin}/share/${auditResult.id}`)
+    } catch (e) {
+      console.error('Failed to save audit', e)
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!email || !result) return
+    if (honeypot) return
+    setLoading(true)
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          company,
+          role,
+          teamSize: result.input.teamSize,
+          auditId: result.id,
+          tools: result.input.tools,
+          totalMonthlySavings: result.totalMonthlySavings,
+          totalAnnualSavings: result.totalAnnualSavings,
+          honeypot,
+        }),
+      })
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          totalMonthlySavings: result.totalMonthlySavings,
+          totalAnnualSavings: result.totalAnnualSavings,
+          isHighSavings: result.totalMonthlySavings > 500,
+        }),
+      })
+      setSubmitted(true)
+    } catch (e) {
+      console.error('Failed to submit', e)
+      setSubmitted(true)
+    }
+    setLoading(false)
+  }
 
   if (!result) {
     return (
@@ -45,6 +107,7 @@ export default function ResultsPage() {
         <a href="/" className="text-xl font-bold text-emerald-600">SpendLens</a>
         <a href="/audit" className="text-sm text-gray-500 hover:text-emerald-600">New Audit</a>
       </nav>
+
       <div className="max-w-2xl mx-auto px-6 py-12">
         <div className={`rounded-2xl p-8 mb-8 text-center ${isLowSavings ? 'bg-blue-50' : 'bg-emerald-50'}`}>
           {isLowSavings ? (
@@ -109,12 +172,14 @@ export default function ResultsPage() {
             ) : (
               <div>
                 <h3 className="font-semibold text-gray-900 mb-4">Your details</h3>
-                <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" />
+                <input type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)} className="hidden" tabIndex={-1} autoComplete="off" />
                 <div className="space-y-3">
                   <input type="email" placeholder="Email address *" value={email} onChange={e => setEmail(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white" required />
                   <input type="text" placeholder="Company name (optional)" value={company} onChange={e => setCompany(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white" />
                   <input type="text" placeholder="Your role (optional)" value={role} onChange={e => setRole(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white" />
-                  <button onClick={() => { if (!email) return; setSubmitted(true) }} className="w-full bg-emerald-600 text-white py-3 rounded-full font-semibold text-sm hover:bg-emerald-700 transition">Send Report</button>
+                  <button onClick={handleSubmit} disabled={loading} className="w-full bg-emerald-600 text-white py-3 rounded-full font-semibold text-sm hover:bg-emerald-700 transition disabled:opacity-40">
+                    {loading ? 'Sending...' : 'Send Report'}
+                  </button>
                 </div>
               </div>
             )}
@@ -130,7 +195,16 @@ export default function ResultsPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm text-center">
           <h3 className="font-semibold text-gray-900 mb-2">Share this audit</h3>
           <p className="text-sm text-gray-500 mb-4">Know someone overpaying for AI tools? Share SpendLens with them.</p>
-          <button onClick={() => { navigator.clipboard.writeText(window.location.href); alert('Link copied!') }} className="bg-gray-100 text-gray-700 px-6 py-3 rounded-full font-semibold text-sm hover:bg-gray-200 transition">Copy Link</button>
+          <button
+            onClick={() => {
+              const url = shareUrl || window.location.href
+              navigator.clipboard.writeText(url)
+              alert('Link copied!')
+            }}
+            className="bg-gray-100 text-gray-700 px-6 py-3 rounded-full font-semibold text-sm hover:bg-gray-200 transition"
+          >
+            Copy Share Link
+          </button>
         </div>
       </div>
     </main>

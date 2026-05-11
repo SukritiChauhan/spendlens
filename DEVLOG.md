@@ -21,3 +21,15 @@
 **Blockers / what I'm stuck on:** Anthropic API returning credit balance error — need to add billing credits tomorrow. The /api/audit route returning 404 — need to investigate folder structure issue.
 
 **Plan for tomorrow:** Fix the /api/audit 404 issue. Add Anthropic credits and verify AI summary works. Set up CI/CD with GitHub Actions. Write 5 tests for audit engine. Deploy to Vercel. Start filling in all required markdown documents.
+
+## Day 3 — 2026-05-11
+
+**Hours worked:** 7
+
+**What I did:** Fixed duplicate nested lib folder that was causing Vercel build to fail. Switched from Anthropic API to Groq (free tier, llama-3.1-8b-instant model) for AI summary generation — Anthropic required ₹560 in prepaid credits which was not practical. Fixed decommissioned Groq model error by updating to llama-3.1-8b-instant. Deployed SpendLens to Vercel at https://spendlens-lemon-delta.vercel.app. Filled all required markdown files — PRICING_DATA.md, PROMPTS.md, ARCHITECTURE.md, GTM.md, ECONOMICS.md, LANDING_COPY.md, METRICS.md, README.md, REFLECTION.md. Added screenshots to repo.
+
+**What I learned:** Vercel builds are strict about TypeScript errors that Next.js dev mode ignores. Always run npm run build locally before pushing to catch type errors. Groq is a genuinely good free alternative to paid LLM APIs for simple summarisation tasks.
+
+**Blockers / what I'm stuck on:** Still need to do user interviews — have not sent messages to potential users yet. Need to set up CI/CD and write 5 tests for audit engine. Need to fill USER_INTERVIEWS.md with real conversations.
+
+**Plan for tomorrow:** Send user interview messages first thing. Set up GitHub Actions CI/CD. Write 5 tests for audit engine. Fill USER_INTERVIEWS.md. Final polish and Lighthouse check.

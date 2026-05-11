@@ -24,12 +24,12 @@
 
 ## Day 3 — 2026-05-11
 
-**Hours worked:** 7
+**Hours worked:** 8
 
-**What I did:** Fixed duplicate nested lib folder that was causing Vercel build to fail. Switched from Anthropic API to Groq (free tier, llama-3.1-8b-instant model) for AI summary generation — Anthropic required ₹560 in prepaid credits which was not practical. Fixed decommissioned Groq model error by updating to llama-3.1-8b-instant. Deployed SpendLens to Vercel at https://spendlens-lemon-delta.vercel.app. Filled all required markdown files — PRICING_DATA.md, PROMPTS.md, ARCHITECTURE.md, GTM.md, ECONOMICS.md, LANDING_COPY.md, METRICS.md, README.md, REFLECTION.md. Added screenshots to repo.
+**What I did:** Fixed duplicate nested lib folder that was causing Vercel build to fail with TypeScript error. Switched from Anthropic API to Groq free tier (llama-3.1-8b-instant) for AI summary generation — Anthropic required prepaid credits which was not practical. Fixed decommissioned Groq model error. Successfully deployed SpendLens to Vercel at https://spendlens-lemon-delta.vercel.app. Filled all required markdown files — PRICING_DATA.md, PROMPTS.md, ARCHITECTURE.md, GTM.md, ECONOMICS.md, LANDING_COPY.md, METRICS.md, README.md, REFLECTION.md, TESTS.md. Added screenshots to repo and README. Set up GitHub Actions CI/CD workflow. Wrote 5 audit engine tests — all passing. Fixed CI lint error by running jest directly.
 
-**What I learned:** Vercel builds are strict about TypeScript errors that Next.js dev mode ignores. Always run npm run build locally before pushing to catch type errors. Groq is a genuinely good free alternative to paid LLM APIs for simple summarisation tasks.
+**What I learned:** Vercel TypeScript builds are stricter than Next.js dev mode — always run npm run build locally before pushing. GitHub Personal Access Token needs workflow scope to push CI files. Groq is a genuinely good free alternative to paid LLM APIs.
 
-**Blockers / what I'm stuck on:** Still need to do user interviews — have not sent messages to potential users yet. Need to set up CI/CD and write 5 tests for audit engine. Need to fill USER_INTERVIEWS.md with real conversations.
+**Blockers / what I'm stuck on:** USER_INTERVIEWS.md still empty — need to send messages to potential users tonight and get replies by tomorrow. This is the highest risk item remaining.
 
-**Plan for tomorrow:** Send user interview messages first thing. Set up GitHub Actions CI/CD. Write 5 tests for audit engine. Fill USER_INTERVIEWS.md. Final polish and Lighthouse check.
+**Plan for tomorrow:** Send user interview messages first thing. Complete USER_INTERVIEWS.md with 3 real conversations. Final polish on the live site. Check Lighthouse scores. Submit before May 13 deadline.

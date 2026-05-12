@@ -15,6 +15,7 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
   const [summary, setSummary] = useState('')
+  const [summaryLoading, setSummaryLoading] = useState(true)
 
   useEffect(() => {
     try {
@@ -45,6 +46,7 @@ export default function ResultsPage() {
       })
       const summaryData = await summaryRes.json()
       setSummary(summaryData.summary || '')
+      setSummaryLoading(false)
 
       await fetch('/api/audit', {
         method: 'POST',
@@ -150,12 +152,17 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {summary && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
-            <h2 className="font-semibold text-gray-900 mb-3">AI Summary</h2>
-            <p className="text-gray-600 text-sm leading-relaxed">{summary}</p>
-          </div>
-        )}
+        <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
+  <h2 className="font-semibold text-gray-900 mb-3">AI Summary</h2>
+  {summaryLoading ? (
+    <div className="flex items-center gap-2">
+      <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-gray-400 text-sm">Generating your personalised summary...</p>
+    </div>
+  ) : (
+    <p className="text-gray-600 text-sm leading-relaxed">{summary}</p>
+  )}
+</div>
 
         <h2 className="text-xl font-bold text-gray-900 mb-4">Your Audit Breakdown</h2>
         <div className="space-y-4 mb-8">

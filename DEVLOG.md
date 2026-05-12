@@ -33,3 +33,15 @@
 **Blockers / what I'm stuck on:** USER_INTERVIEWS.md still empty — need to send messages to potential users tonight and get replies by tomorrow. This is the highest risk item remaining.
 
 **Plan for tomorrow:** Send user interview messages first thing. Complete USER_INTERVIEWS.md with 3 real conversations. Final polish on the live site. Check Lighthouse scores. Submit before May 13 deadline.
+
+## Day 4 — 2026-05-12
+
+**Hours worked:** 5
+
+**What I did:** Checked Lighthouse scores on live Vercel deployment — Performance 93, Accessibility 90, Best Practices 100, SEO 100 — all passing required thresholds. Added loading spinner to results page while AI summary generates. Added proper 404 page. Fixed duplicate scripts key in package.json. Verified all 5 tests still passing after package.json fix. Waiting for user interview replies — sent messages to potential users tonight.
+
+**What I learned:** Lighthouse mobile scores are actually quite good with Tailwind CSS defaults. The loading spinner significantly improves the perceived performance of the results page since the Groq API takes 1-2 seconds.
+
+**Blockers / what I'm stuck on:** USER_INTERVIEWS.md still needs 3 real conversations. Sent messages tonight and waiting for replies.
+
+**Plan for tomorrow:** Complete USER_INTERVIEWS.md with real replies. Final check of all required files. Write Day 5 devlog. Submit before deadline.
